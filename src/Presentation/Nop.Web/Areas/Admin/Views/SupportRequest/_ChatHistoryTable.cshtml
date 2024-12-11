@@ -3,11 +3,11 @@
 <div class="column">
     @if (!Model.Messages.Any())
     {
-        <p>No chat messages.</p>
+        <p>No support requests available.</p>
     }
     else
     {
-        <table>
+        <table class="table table-striped table-bordered">
             <thead>
             <tr>
                 <th>ID</th>
@@ -34,3 +34,20 @@
         </table>
     }
 </div>
+
+<script>
+    function updateChatTable() {
+        $.ajax({
+            url: '@Url.Action("Chat", new {requestID = Model.RequestId})',
+            type: 'GET',
+            success: function (data) {
+                $('#new-message').val('');
+                $('#ChatHistoryTable').html(data);
+            },
+            error: function (err) {
+                alert('An error occured while updating the table. Please try again.');
+                console.log(err);
+            }
+        });
+    }
+</script>

@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 <div id="ChatHistoryTable">
-                    @Html.Partial("_ChatHistoryTable", Model)
+                    @Html.Partial("_UserChatHistoryTable", Model)
                 </div>
             </section>
         </div>
@@ -50,21 +50,6 @@
 </div>
 
 <script>
-    
-    function updateChatTable() {
-        $.ajax({
-            url: '@Url.Action("Chat", new {requestID = Model.RequestId})',
-            type: 'GET',
-            success: function (data) {
-                $('#new-message').val('');
-                $('#ChatHistoryTable').html(data);
-            },
-            error: function (err) {
-                alert('An error occured while updating the table. Please try again.');
-                console.log(err);
-            }
-        });
-    }
 
     function SendChatMessage() {
         $.ajax({

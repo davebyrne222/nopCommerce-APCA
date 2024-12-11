@@ -96,7 +96,7 @@ public class SupportRequestController : BasePublicController
         
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
         {
-            return PartialView("_ChatHistoryTable", viewModel);
+            return PartialView("_UserChatHistoryTable", viewModel);
         }
         
         return View(viewModel);
@@ -105,8 +105,6 @@ public class SupportRequestController : BasePublicController
     [HttpPost]
     public async Task<IActionResult> Chat(SupportChatViewModel model)
     {
-        Console.WriteLine($"------- Chat HTTP: {ModelState.IsValid}");
-        
         if (!ModelState.IsValid)
         {
             var errors = ModelState
@@ -130,7 +128,6 @@ public class SupportRequestController : BasePublicController
         return Json(new { success = true, message = "successfully added new message" });
     }
 
-    
     #endregion
     
 }

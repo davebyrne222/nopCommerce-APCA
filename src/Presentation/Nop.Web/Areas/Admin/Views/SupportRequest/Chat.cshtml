@@ -40,51 +40,16 @@
                                         </form>
                                     </li>
                                 </ol>
-
-                                <form asp-action="Chat" method="post">
-                                    <input type="hidden" asp-for="RequestId" value="@Model.RequestId"/>
-                                    <div class="form-group">
-                                        <textarea asp-for="NewMessage" class="form-control" placeholder="Type your message here..."></textarea>
-                                        <span asp-validation-for="NewMessage" class="text-danger"></span>
-                                    </div>
-                                    <div class="action-btn-cntr">
-                                        <button type="submit" class="btn btn-primary">Send</button>
-                                    </div>
-                                </form>
+                                <div class="form-group">
+                                    <textarea asp-for="NewMessage" id="new-message" class="form-control" placeholder="Type your message here..."></textarea>
+                                    <span asp-validation-for="NewMessage" class="text-danger"></span>
+                                </div>
+                                <div class="action-btn-cntr">
+                                    <button class="btn btn-primary" id="new-message-btn">Send</button>
+                                </div>
                             </div>
-                            <div class="column">
-                                @if (!Model.Messages.Any())
-                                {
-                                    <p>No support requests available.</p>
-                                }
-                                else
-                                {
-                                    <table class="table table-striped table-bordered">
-                                        <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Request ID</th>
-                                            <th>Author ID</th>
-                                            <th>IsAdmin</th>
-                                            <th>CreatedOnUtc</th>
-                                            <th>Message</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach (var message in Model.Messages)
-                                        {
-                                            <tr>
-                                                <td>@message.Id</td>
-                                                <td>@message.RequestId</td>
-                                                <td>@message.AuthorId</td>
-                                                <td>@message.IsAdmin</td>
-                                                <td>@message.CreatedOnUtc</td>
-                                                <td>@message.Message</td>
-                                            </tr>
-                                        }
-                                        </tbody>
-                                    </table>
-                                }
+                            <div id="ChatHistoryTable">
+                                @Html.Partial("_ChatHistoryTable", Model)
                             </div>
                         </div>
                     </div>
@@ -93,3 +58,45 @@
         </div>
     </div>
 </section>
+
+<script>
+    function SendChatMessage() {
+        var postData = {
+            requestId : @Model.RequestId,
+            newMessage : $('#new-message').val()
+        }
+        
+        addAntiForgeryToken(postData);
+        
+        $.ajax({
+            url: '@Url.Action("Chat")',
+            type: 'POST',
+            data: postData,
+            success: function (response) {
+                $('.text-danger').text('').removeClass('field-validation-error').addClass('field-validation-valid');
+                if (response.success) {
+                    updateChatTable()
+                } else {
+                    $.each(response.errors, function (key, messages) {
+                        const field = $(`[data-valmsg-for="${key}"]`);
+                        field.text(messages.join(', '))
+                            .removeClass('field-validation-valid')
+                            .addClass('field-validation-error');
+                    });
+                }
+            },
+            error: function (err) {
+                alert('An error occured while adding the message. Please try again.');
+                console.log(err);
+            }
+        });
+    }
+    
+    $(document).ready(function () {
+        $('#new-message-btn').on('click', function () {
+            SendChatMessage();
+        });
+    });
+
+
+</script>
