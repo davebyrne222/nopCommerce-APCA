@@ -21,13 +21,26 @@ public class SupportRequestController : BasePublicController
     
     #region Request List
     
-    public async Task<IActionResult> List()
+    public async Task<IActionResult> List(int pageIndex = 0, int pageSize = 5)
     {
-        var requestList = await _supportRequestService.GetUserSupportRequestsAsync(_currentUserId);
+        var requestList = await _supportRequestService.GetUserSupportRequestsAsync(_currentUserId, pageIndex, pageSize);
         
-        var requests = requestList.Result.ToList();
+        var viewModel = new SupportListViewModel()
+        {
+            Requests = requestList.Result.ToList(),
+            PageSize = pageSize,
+            CurrentPage = pageIndex,
+            HasPreviousPage = requestList.Result.HasPreviousPage,
+            HasNextPage = requestList.Result.HasNextPage,
+            TotalPages = requestList.Result.TotalPages,
+        };
         
-        return View(requests);
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            return PartialView("_RequestsTable", viewModel);
+        }
+        
+        return View(viewModel);
     }
     
     #endregion
@@ -81,29 +94,40 @@ public class SupportRequestController : BasePublicController
             Messages = baseMessages.Result.ToList()
         };
         
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            return PartialView("_UserChatHistoryTable", viewModel);
+        }
+        
         return View(viewModel);
     }
 
     [HttpPost]
     public async Task<IActionResult> Chat(SupportChatViewModel model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var entityModel = new SupportMessage()
-            {
-                RequestId = model.RequestId,
-                AuthorId = _currentUserId,
-                Message = model.NewMessage
-            };
-        
-            await _supportRequestService.CreateSupportMessageAsync(entityModel);
-        
-            return RedirectToAction("Chat", new { requestId = model.RequestId });
+            var errors = ModelState
+                .Where(x => x.Value.Errors.Any())
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+            return Json(new { success = false, errors });
         }
-        return View(model);
+
+        var entityModel = new SupportMessage()
+        {
+            RequestId = model.RequestId,
+            AuthorId = _currentUserId,
+            Message = model.NewMessage
+        };
+    
+        await _supportRequestService.CreateSupportMessageAsync(entityModel);
+
+        return Json(new { success = true, message = "successfully added new message" });
     }
 
-    
     #endregion
     
 }

@@ -6,8 +6,10 @@ namespace Nop.Web.Areas.Admin.Models.Support;
 
 public class SupportListViewModel
 {
+    // requests to be displayed
     public List<SupportRequest>? Requests { get; set; }
     
+    // pagination
     public bool HasPreviousPage { get; set; }
     
     public bool HasNextPage { get; set; }
@@ -18,6 +20,7 @@ public class SupportListViewModel
     
     public int PageSize { get; set; }
 
+    // sort requests by date
     public static List<SelectListItem> SortOptions { get; } = new()
     {
         new SelectListItem() { Text = "Oldest", Value = "date_asc" },
@@ -26,11 +29,13 @@ public class SupportListViewModel
     
     public string? SelectedSortOption { get; set; }
     
+    // Term to search in requests
+    public string? SearchTerm { get; set; }
+    
+    // filter requests by status
     public static List<SelectListItem> AvailableStatuses { get; private set; } = GetAvailableStatuses();
     
     public string? FilterByStatus { get; set; }
-    
-    public string? SearchTerm { get; set; }
     
     private static List<SelectListItem> GetAvailableStatuses()
     {

@@ -151,6 +151,8 @@ public class SupportRequestService : ISupportRequestService
         // Error Handling - Input validation
         if (pageIndex < 0) throw new ArgumentException("pageIndex must not be negative", nameof(pageIndex));
         if (pageSize < 0) throw new ArgumentException("pageSize must not be negative", nameof(pageSize));
+        
+        // TODO: Make sure only admins can use this method
 
         // Create new response object
         SupportRequestResult<IPagedList<SupportRequest>> response = new();
@@ -202,15 +204,21 @@ public class SupportRequestService : ISupportRequestService
     ///     related to the specified user.
     ///     If the operation fails due to exceptions or validation errors, the errors will be populated in this result.
     /// </returns>
-    public async Task<SupportRequestResult<IList<SupportRequest>>> GetUserSupportRequestsAsync(int userId)
+    public async Task<SupportRequestResult<IPagedList<SupportRequest>>> GetUserSupportRequestsAsync(
+        int userId, 
+        int pageIndex = 0,
+        int pageSize = 5)
     {
         // create new response object
-        SupportRequestResult<IList<SupportRequest>> response = new();
+        SupportRequestResult<IPagedList<SupportRequest>> response = new();
 
         // Catch any error that may happen when querying the database
         try
         {
-            response.Result = _supportRequestRepository.Table.Where(sr => sr.CustomerId == userId).ToList();
+            response.Result = await _supportRequestRepository.GetAllPagedAsync(query =>
+            {
+                return query.Where(sr => sr.CustomerId == userId);
+            }, pageIndex, pageSize);
         }
         catch (Exception exc)
         {

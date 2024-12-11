@@ -1,0 +1,53 @@
+@model SupportChatViewModel
+
+<div class="column">
+    @if (!Model.Messages.Any())
+    {
+        <p>No chat messages.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Request ID</th>
+                <th>Author ID</th>
+                <th>IsAdmin</th>
+                <th>CreatedOnUtc</th>
+                <th>Message</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var message in Model.Messages)
+            {
+                <tr>
+                    <td>@message.Id</td>
+                    <td>@message.RequestId</td>
+                    <td>@message.AuthorId</td>
+                    <td>@message.IsAdmin</td>
+                    <td>@message.CreatedOnUtc</td>
+                    <td>@message.Message</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+
+<script>
+    function updateChatTable() {
+        $.ajax({
+            url: '@Url.Action("Chat", new {requestID = Model.RequestId})',
+            type: 'GET',
+            success: function (data) {
+                $('#new-message').val('');
+                $('#ChatHistoryTable').html(data);
+            },
+            error: function (err) {
+                alert('An error occured while updating the table. Please try again.');
+                console.log(err);
+            }
+        });
+    }
+</script>

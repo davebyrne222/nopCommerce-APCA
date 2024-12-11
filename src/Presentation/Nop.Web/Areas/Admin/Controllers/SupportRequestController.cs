@@ -58,6 +58,11 @@ public class SupportRequestController : BaseAdminController
             SearchTerm = searchTerm
         };
         
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            return PartialView("_SupportRequestsTable", viewModel);
+        }
+        
         return View(viewModel);
     }
     
@@ -88,38 +93,63 @@ public class SupportRequestController : BaseAdminController
             Messages = baseMessages.Result.ToList()
         };
         
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            return PartialView("_ChatHistoryTable", viewModel);
+        }
+        
         return View(viewModel);
     }
-
+    
     [HttpPost]
     public async Task<IActionResult> Chat(SupportChatViewModel model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var entityModel = new SupportMessage()
-            {
-                RequestId = model.RequestId,
-                AuthorId = _currentUserId,
-                Message = model.NewMessage
-            };
-        
-            await _supportRequestService.CreateSupportMessageAsync(entityModel);
-        
-            return RedirectToAction("Chat", new { requestId = model.RequestId });
+            var errors = ModelState
+                .Where(x => x.Value.Errors.Any())
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+            return Json(new { success = false, errors });
         }
-        return View(model);
+
+        var entityModel = new SupportMessage()
+        {
+            RequestId = model.RequestId,
+            AuthorId = _currentUserId,
+            Message = model.NewMessage
+        };
+    
+        await _supportRequestService.CreateSupportMessageAsync(entityModel);
+
+        return Json(new { success = true, message = "successfully added new message" });
     }
 
     [HttpPost]
     public async Task<IActionResult> UpdateRequestStatus(SupportChatViewModel model)
     {
+
         var request = await _supportRequestService.GetSupportRequestByIdAsync(model.RequestId);
+
+        if (request.Success == false)
+        {
+            return Json(new { success = false, error = "Request does not exist" });
+        }
         
         request.Result.Status = model.Status;
         
         var response = await _supportRequestService.UpdateSupportRequestAsync(request.Result);
         
-        return RedirectToAction("Chat", new { requestId = response.Result.Id });
+        if (response.Success)
+        {
+            return Json(new { success = true, message = "successfully updated" });
+        }
+        else
+        {
+            return Json(new { success = false, errors = response.Errors });
+        }
     }
 
     public async Task<IActionResult> Delete(int requestId)

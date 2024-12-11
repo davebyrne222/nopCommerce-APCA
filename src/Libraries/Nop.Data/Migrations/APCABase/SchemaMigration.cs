@@ -4,7 +4,7 @@ using Nop.Data.Extensions;
 
 namespace Nop.Data.Migrations.APCABase;
 
-[NopSchemaMigration("2024/11/23 18:04:00:0000000", "AP CA Base Schema Migration", MigrationProcessType.Update)]
+[NopSchemaMigration("2024/11/23 18:04:00:0000000", "AP CA Base Schema Migration", MigrationProcessType.Installation)]
 public class SchemaMigration: ForwardOnlyMigration
 {
     public override void Up()

@@ -33,78 +33,57 @@
                         <li class="heading">Status</li>
                         <li class="info">@Model.Status</li>
                     </ol>
-
-                    <form asp-action="Chat" method="post">
-                        <input type="hidden" asp-for="RequestId" value="@Model.RequestId"/>
-                        <div class="form-group">
-                            <textarea asp-for="NewMessage" class="form-control" placeholder="Type your message here..."></textarea>
-                            <span asp-validation-for="NewMessage" class="text-danger"></span>
-                        </div>
-                        <div class="action-btn-cntr">
-                            <button type="submit" class="btn btn-primary">Send</button>
-                        </div>
-                    </form>
-                </div>
-                    <div class="column">
-                        @if (!Model.Messages.Any())
-                        {
-                            <p>No chat messages.</p>
-                        }
-                        else
-                        {
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Request ID</th>
-                                    <th>Author ID</th>
-                                    <th>IsAdmin</th>
-                                    <th>CreatedOnUtc</th>
-                                    <th>Message</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @foreach (var message in Model.Messages)
-                                {
-                                    <tr>
-                                        <td>@message.Id</td>
-                                        <td>@message.RequestId</td>
-                                        <td>@message.AuthorId</td>
-                                        <td>@message.IsAdmin</td>
-                                        <td>@message.CreatedOnUtc</td>
-                                        <td>@message.Message</td>
-                                    </tr>
-                                }
-                                </tbody>
-                            </table>
-                        }
+                    <div class="form-group">
+                        <textarea asp-for="NewMessage" id="new-message" class="form-control" placeholder="Type your message here..."></textarea>
+                        <span asp-validation-for="NewMessage" class="text-danger"></span>
                     </div>
+                    <div class="action-btn-cntr">
+                        <button class="btn btn-primary" id="new-message-btn">Send</button>
+                    </div>
+                </div>
+                <div id="ChatHistoryTable">
+                    @Html.Partial("_UserChatHistoryTable", Model)
+                </div>
             </section>
         </div>
     </div>
 </div>
 
-<script asp-location="Footer">
-    function removeexternalassociation(itemId) {
-        if (confirm('@T("Common.AreYouSure")')) {
-            var postData = {
-                id: itemId
-            };
-            addAntiForgeryToken(postData);
-            $.ajax({
-                cache: false,
-                type: "POST",
-                url: "@Url.RouteUrl("CustomerRemoveExternalAssociation")",
-                data: postData,
-                dataType: "json",
-                success: function (data, textStatus, jqXHR) {
-                    location.href = data.redirect;
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    alert('Failed to delete');
+<script>
+
+    function SendChatMessage() {
+        $.ajax({
+            url: '@Url.Action("Chat")',
+            type: 'POST',
+            data: {
+                requestId : @Model.RequestId,
+                newMessage : $('#new-message').val()
+            },
+            success: function (response) {
+                $('.text-danger').text('').removeClass('field-validation-error').addClass('field-validation-valid');
+                if (response.success) {
+                    updateChatTable()
+                } else {
+                    $.each(response.errors, function (key, messages) {
+                        const field = $(`[data-valmsg-for="${key}"]`);
+                        field.text(messages.join(', '))
+                            .removeClass('field-validation-valid')
+                            .addClass('field-validation-error');
+                    });
                 }
-            });
-        }
-        return false;
+            },
+            error: function (err) {
+                alert('An error occured while adding the message. Please try again.');
+                console.log(err);
+            }
+        });
     }
+    
+    $(document).ready(function () {
+        $('#new-message-btn').on('click', function () {
+            SendChatMessage();
+        });
+    });
+
+
 </script>
