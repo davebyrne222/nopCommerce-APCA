@@ -37,18 +37,33 @@ else
 }
 
 <div class="support-request-pagination">
-@if (Model.TotalPages > 1)
-{
-    <ul>
-        @for (int i = 0; i < Model.TotalPages; i++)
-        {
-            <li>
-                <a href="javascript:void(0);" onclick="updateTable('@Url.Action("List", new { sortBy = @Model.SelectedSortOption, filterByStatus = @Model.FilterByStatus, searchTerm = @Model.SearchTerm, pageIndex = i, pageSize = @Model.PageSize })')" 
-                   class="@(i == Model.CurrentPage ? "active" : "")">
-                    @(i + 1)
-                </a>
-            </li>
-        }
-    </ul>   
-}
+    @if (Model.TotalPages > 1)
+    {
+        <ul>
+            @for (int i = 0; i < Model.TotalPages; i++)
+            {
+                <li>
+                    <a href="javascript:void(0);" onclick="updateTable('@Url.Action("List", new { sortBy = @Model.SelectedSortOption, filterByStatus = @Model.FilterByStatus, searchTerm = @Model.SearchTerm, pageIndex = i, pageSize = @Model.PageSize })')" 
+                       class="@(i == Model.CurrentPage ? "active" : "")">
+                        @(i + 1)
+                    </a>
+                </li>
+            }
+        </ul>   
+    }
 </div>
+
+<script>
+    function updateTable(url) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (data) {
+                $('#supportRequestsTable').html(data);
+            },
+            error: function () {
+                alert('An error occured while updating the table. Please try again.');
+            }
+        });
+    }
+</script>

@@ -49,19 +49,6 @@
 </section>
 
 <script>
-    function updateTable(url) {
-        $.ajax({
-            url: url,
-            type: 'GET',
-            success: function (data) {
-                $('#supportRequestsTable').html(data);
-            },
-            error: function () {
-                alert('An error occured while updating the table. Please try again.');
-            }
-        });
-    }
-
     $(document).ready(function () {
         $('#sortBy, #filterByStatus, #searchTerm').on('change keyup', function () {
             var url = '@Url.Action("List")' +
