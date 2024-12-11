@@ -22,8 +22,10 @@ public interface ISupportRequestService
         int pageIndex = 0,
         int pageSize = 5);
     
-    public Task<SupportRequestResult<IList<SupportRequest>>> GetUserSupportRequestsAsync(int userId);
-    
+    public Task<SupportRequestResult<IPagedList<SupportRequest>>> GetUserSupportRequestsAsync(
+        int userId, 
+        int pageIndex = 0,
+        int pageSize = 5);
     
     // Update
     public Task<SupportRequestResult<SupportRequest>> UpdateSupportRequestAsync(SupportRequest request);

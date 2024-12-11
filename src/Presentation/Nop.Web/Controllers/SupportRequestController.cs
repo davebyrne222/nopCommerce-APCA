@@ -21,13 +21,26 @@ public class SupportRequestController : BasePublicController
     
     #region Request List
     
-    public async Task<IActionResult> List()
+    public async Task<IActionResult> List(int pageIndex = 0, int pageSize = 5)
     {
-        var requestList = await _supportRequestService.GetUserSupportRequestsAsync(_currentUserId);
+        var requestList = await _supportRequestService.GetUserSupportRequestsAsync(_currentUserId, pageIndex, pageSize);
         
-        var requests = requestList.Result.ToList();
+        var viewModel = new SupportListViewModel()
+        {
+            Requests = requestList.Result.ToList(),
+            PageSize = pageSize,
+            CurrentPage = pageIndex,
+            HasPreviousPage = requestList.Result.HasPreviousPage,
+            HasNextPage = requestList.Result.HasNextPage,
+            TotalPages = requestList.Result.TotalPages,
+        };
         
-        return View(requests);
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            return PartialView("_RequestsTable", viewModel);
+        }
+        
+        return View(viewModel);
     }
     
     #endregion
