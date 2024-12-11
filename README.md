@@ -1,4 +1,32 @@
-﻿﻿nopCommerce: free and open-source eCommerce solution
+﻿# nopCommerce-APCA
+A fork of [nopCommerce](https://www.nopcommerce.com/?utm_source=github&utm_medium=content&utm_campaign=homepage) created in partial fulfillment of the requirements of the module in Advanced Programming of the DBS H.Dip. in Computer Science. This project adds a support feature to nopCommerce.
+
+## Quick Start
+The following is a succinct guide to quickly getting the project up and running - this is primarily for the lecturer and fellow students of the course but will get anyone up and running.
+
+For more comprehensive guide, see the orignal nopCommerce guide below.
+
+### Pre-requisites
+A SQL Server, PostgreSQL, or MySQL instance must be available. Please make sure one is available for the project to create a new database.
+
+### Setup
+1. Run the project from the command line or your IDE of choice
+2. Navigate to http://localhost:5000: a setup wizard will be displayed
+3. `Store Information`:
+   1. Please enter an email and password of your choosing
+   3. **N.B. please also select the `Create sample data` option**
+4. `Database Information`:
+   1. Choose the database of your choice
+   2. **N.B. please also select the `Create database if it doesnt exist` option**
+   3. For `Server name`, enter the hostname of your database server, for example `localhost`
+   4. For `Database name`, enter a database name of your choosing. This database will be created in the above host.
+   5. For `SQL Username` and `SQL Password`, enter the associated username and password of the aforementioned host
+5. Press `Install`
+
+The system will now complete installation and terminate. Once the system has completed installation, please re-run the project and refresh your browser.
+
+
+﻿nopCommerce: free and open-source eCommerce solution
 ===========
 
 [nopCommerce](https://www.nopcommerce.com/?utm_source=github&utm_medium=content&utm_campaign=homepage) is the best open-source eCommerce platform. nopCommerce is free, and it is the most popular ASP.NET Core shopping cart.
