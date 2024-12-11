@@ -34,10 +34,7 @@
                                     <li class="info">@Model.Subject</li>
                                     <li class="heading">Status</li>
                                     <li class="info">
-                                        <form asp-action="UpdateRequestStatus" method="post">
-                                            <input type="hidden" asp-for="RequestId" value="@Model.RequestId"/>
-                                            <select asp-for="Status" asp-items="@SupportChatViewModel.AvailableStatuses" onchange="this.form.submit()"></select>
-                                        </form>
+                                        <select asp-for="Status" asp-items="@SupportChatViewModel.AvailableStatuses" id="status-select"></select>
                                     </li>
                                 </ol>
                                 <div class="form-group">
@@ -60,18 +57,19 @@
 </section>
 
 <script>
-    function SendChatMessage() {
+    function sendChatMessage() {
         var postData = {
             requestId : @Model.RequestId,
             newMessage : $('#new-message').val()
         }
-        
+
         addAntiForgeryToken(postData);
         
         $.ajax({
             url: '@Url.Action("Chat")',
             type: 'POST',
             data: postData,
+            
             success: function (response) {
                 $('.text-danger').text('').removeClass('field-validation-error').addClass('field-validation-valid');
                 if (response.success) {
@@ -85,17 +83,44 @@
                     });
                 }
             },
+            
             error: function (err) {
                 alert('An error occured while adding the message. Please try again.');
                 console.log(err);
             }
         });
     }
+
+     function updateStatus() {
+         var postData = {
+             RequestId: @Model.RequestId,
+             Status: $(this).val()
+         }
+         
+         addAntiForgeryToken(postData);
+         
+        $.ajax({
+            url: '@Url.Action("UpdateRequestStatus")',
+            type: 'POST',
+            data: postData,
+
+            success: function (response) {
+                console.log(response);
+                if (!response.success) {
+                    alert('Failed to update status. Please try again.');
+                }
+            },
+            
+            error: function (xhr, status, error) {
+                console.error('Error occurred:', status, error);
+                alert('An error occurred while updating the status. Please try again.');
+            }
+        });
+    }
     
     $(document).ready(function () {
-        $('#new-message-btn').on('click', function () {
-            SendChatMessage();
-        });
+        $('#new-message-btn').on('click', sendChatMessage);
+        $('#status-select').on('change', updateStatus);
     });
 
 

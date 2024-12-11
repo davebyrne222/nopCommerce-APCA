@@ -130,13 +130,26 @@ public class SupportRequestController : BaseAdminController
     [HttpPost]
     public async Task<IActionResult> UpdateRequestStatus(SupportChatViewModel model)
     {
+
         var request = await _supportRequestService.GetSupportRequestByIdAsync(model.RequestId);
+
+        if (request == null)
+        {
+            return Json(new { success = false, error = "Request does not exist" });
+        }
         
         request.Result.Status = model.Status;
         
         var response = await _supportRequestService.UpdateSupportRequestAsync(request.Result);
         
-        return RedirectToAction("Chat", new { requestId = response.Result.Id });
+        if (response.Success)
+        {
+            return Json(new { success = true, message = "successfully updated" });
+        }
+        else
+        {
+            return Json(new { success = false, errors = response.Errors });
+        }
     }
 
     public async Task<IActionResult> Delete(int requestId)
