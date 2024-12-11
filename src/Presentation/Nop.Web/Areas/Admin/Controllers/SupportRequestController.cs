@@ -58,6 +58,11 @@ public class SupportRequestController : BaseAdminController
             SearchTerm = searchTerm
         };
         
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            return PartialView("_SupportRequestsTable", viewModel);
+        }
+        
         return View(viewModel);
     }
     
