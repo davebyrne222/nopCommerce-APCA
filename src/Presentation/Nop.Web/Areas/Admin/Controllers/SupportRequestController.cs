@@ -133,7 +133,7 @@ public class SupportRequestController : BaseAdminController
 
         var request = await _supportRequestService.GetSupportRequestByIdAsync(model.RequestId);
 
-        if (request == null)
+        if (request.Success == false)
         {
             return Json(new { success = false, error = "Request does not exist" });
         }
