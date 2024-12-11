@@ -1,7 +1,6 @@
 ﻿using LinqToDB;
 using Microsoft.AspNetCore.Authentication;
 using Nop.Core;
-using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Support;
 using Nop.Data;
 using Nop.Services.Customers;
@@ -111,10 +110,8 @@ public class SupportRequestService : ISupportRequestService
             var isAdmin = await _customerService.IsAdminAsync(user);
 
             if (!isAdmin && request.CustomerId != user.Id)
-            {
                 throw new AuthenticationFailureException("You do not have permission to view the support request.");
-            }
-            
+
             response.Result = request;
         }
         catch (Exception exc)
@@ -152,14 +149,18 @@ public class SupportRequestService : ISupportRequestService
         if (pageIndex < 0) throw new ArgumentException("pageIndex must not be negative", nameof(pageIndex));
         if (pageSize < 0) throw new ArgumentException("pageSize must not be negative", nameof(pageSize));
         
-        // TODO: Make sure only admins can use this method
-
         // Create new response object
         SupportRequestResult<IPagedList<SupportRequest>> response = new();
 
         // Catch any error that may happen when querying the database and notify user and/or admin
         try
         {
+            // Make sure only admins can use this method
+            var user = await _workContext.GetCurrentCustomerAsync();
+            var isAdmin = await _customerService.IsAdminAsync(user);
+
+            if (!isAdmin) throw new AuthenticationFailureException("You do not have permission to view this resource.");
+
             response.Result = await _supportRequestRepository.GetAllPagedAsync(query =>
             {
                 // filter by status
@@ -205,7 +206,7 @@ public class SupportRequestService : ISupportRequestService
     ///     If the operation fails due to exceptions or validation errors, the errors will be populated in this result.
     /// </returns>
     public async Task<SupportRequestResult<IPagedList<SupportRequest>>> GetUserSupportRequestsAsync(
-        int userId, 
+        int userId,
         int pageIndex = 0,
         int pageSize = 5)
     {
@@ -299,7 +300,7 @@ public class SupportRequestService : ISupportRequestService
         {
             // Retrieve request
             var request = await GetSupportRequestByIdAsync(requestId);
-            
+
             // Delete request
             await _supportRequestRepository.DeleteAsync(request.Result);
         }
