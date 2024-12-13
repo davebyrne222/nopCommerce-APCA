@@ -6,22 +6,24 @@ The following is a succinct guide to quickly getting the project up and running 
 
 For more comprehensive guide, see the orignal nopCommerce guide below.
 
-### Pre-requisites
-A SQL Server, PostgreSQL, or MySQL instance must be available. Please make sure one is available for the project to create a new database.
+### Dependencies
+Please see the [nopCommerce documentation](https://docs.nopcommerce.com/en/developer/tutorials/system-requirements-for-developing.html)
 
 ### Setup
-1. Run the project from the command line or your IDE of choice
-2. Navigate to http://localhost:5000: a setup wizard will be displayed
-3. `Store Information`:
+1. Open the project in your IDE of choice (please note, the author has used JetBrains Rider and so the following steps may be different for Visual Studio)
+2. You may be prompted to install node modules. If so, please do.
+3. Run the `Nop.Web` project
+4. Navigate to http://localhost:5000: a setup wizard will be displayed
+5. `Store Information`:
    1. Please enter an email and password of your choosing
    3. **N.B. please also select the `Create sample data` option**
-4. `Database Information`:
+6. `Database Information`:
    1. Choose the database of your choice
    2. **N.B. please also select the `Create database if it doesnt exist` option**
    3. For `Server name`, enter the hostname of your database server, for example `localhost`
    4. For `Database name`, enter a database name of your choosing. This database will be created in the above host.
    5. For `SQL Username` and `SQL Password`, enter the associated username and password of the aforementioned host
-5. Press `Install`
+7. Press `Install`
 
 The system will now complete installation and terminate. Once the system has completed installation, please re-run the project and refresh your browser.
 
