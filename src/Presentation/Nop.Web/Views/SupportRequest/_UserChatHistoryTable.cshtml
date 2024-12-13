@@ -1,6 +1,6 @@
 @model SupportChatViewModel
 
-<div class="column">
+<div class="column" id="UserChatHistoryTable">
     @if (!Model.Messages.Any())
     {
         <p>No chat messages.</p>
@@ -42,7 +42,7 @@
             type: 'GET',
             success: function (data) {
                 $('#new-message').val('');
-                $('#ChatHistoryTable').html(data);
+                $('#UserChatHistoryTable').html(data);
             },
             error: function (err) {
                 alert('An error occured while updating the table. Please try again.');

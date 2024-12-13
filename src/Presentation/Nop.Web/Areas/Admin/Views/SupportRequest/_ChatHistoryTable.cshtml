@@ -1,6 +1,6 @@
 @model SupportChatViewModel
 
-<div class="column">
+<div class="column" id="ChatHistoryTable">
     @if (!Model.Messages.Any())
     {
         <p>No support requests available.</p>
